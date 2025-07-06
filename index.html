@@ -1,55 +1,112 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Generador de Código QR</title>
-  <!-- Librería QRCode.js desde CDN -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 2rem;
-      text-align: center;
-      background-color: #f5f5f5;
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      width: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      background: linear-gradient(135deg, #89f7fe, #fbc2eb);
+      /* Elimina cualquier separación */
+      background-attachment: fixed;
     }
     h1 {
-      color: #333;
+      margin-bottom: 1rem;
+      font-size: 2.2rem;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+      text-align: center;
     }
     input {
-      width: 60%;
-      padding: 0.5rem;
+      width: 300px;
+      max-width: 80%;
+      padding: 0.9rem;
       font-size: 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      margin: 1rem 0;
+      outline: none;
+      box-sizing: border-box;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
-    button {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      margin-left: 0.5rem;
-      cursor: pointer;
+    input::placeholder {
+      color: #ccc;
     }
     #qrcode {
+      margin: 1.5rem auto;
+      border-radius: 0.5rem;
+      display: inline-block;
+    }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
       margin-top: 1rem;
+    }
+    button {
+      padding: 0.7rem 1.4rem;
+      font-size: 1rem;
+      color: #fff;
+      background: #007bff;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    button:hover {
+      background: #0056b3;
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
   <h1>Generador de Código QR</h1>
-  <input type="text" id="text" placeholder="Introduce texto o URL" />
-  <button onclick="generarQR()">Generar QR</button>
+  <input type="text" id="text" placeholder="Introduce tu URL o texto" />
   <div id="qrcode"></div>
-
+  <div class="buttons">
+    <button onclick="generarQR()">Crear</button>
+    <button onclick="descargarQR()">Descargar</button>
+  </div>
   <script>
+    let canvasQR = null;
+
     function generarQR() {
-      const contenido = document.getElementById('text').value;
+      const contenido = document.getElementById('text').value.trim();
       const qrcodeDiv = document.getElementById('qrcode');
       qrcodeDiv.innerHTML = "";
-      if (contenido.trim() !== "") {
-        QRCode.toCanvas(document.createElement('canvas'), contenido, function (error, canvas) {
-          if (error) {
-            console.error(error);
-            return;
-          }
+      if (contenido !== "") {
+        const canvas = document.createElement('canvas');
+        QRCode.toCanvas(canvas, contenido, { margin: 1 }, function (error) {
+          if (error) console.error(error);
           qrcodeDiv.appendChild(canvas);
+          canvasQR = canvas;
         });
+      }
+    }
+
+    function descargarQR() {
+      if (canvasQR) {
+        const enlace = document.createElement('a');
+        enlace.download = "codigo_qr.png";
+        enlace.href = canvasQR.toDataURL("image/png");
+        enlace.click();
+      } else {
+        alert("Primero genera el código QR.");
       }
     }
   </script>
